@@ -7,14 +7,18 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.IOException;
 
 public class AhhhActivity extends AppCompatActivity {
 
+    private long touchTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_ahhh);
 
         View ahhh_layout = findViewById(R.id.ahhh_bg);
@@ -22,19 +26,36 @@ public class AhhhActivity extends AppCompatActivity {
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.ahhh_1);
         mp.setLooping(true);
 
+        final int minTouchTime = 400;
+
+        final Toast keepToast = Toast.makeText(AhhhActivity.this, "Keep touching the screen to Ahhh!", Toast.LENGTH_SHORT);
+
         ahhh_layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.d("DDO", "DOWN");
+
+                        touchTime = System.currentTimeMillis();
+
                         mp.start();
-                        return true;
+
+                        return false;
+
                     case MotionEvent.ACTION_UP:
-                        Log.d("DDO", "UP");
-                        //mp.stop();
+
+                        final long currentTime = System.currentTimeMillis();
+
+                        if (currentTime - touchTime < minTouchTime) {
+                            if(keepToast.getView().isShown()) {
+                                keepToast.cancel();
+                            }
+                            keepToast.show();
+                        }
+
                         mp.pause();
-                        return true;
+
+                        return false;
                 }
                 return false;
             }
